@@ -29,7 +29,7 @@ public class GameServiceImpl implements GameService {
     private final TagRepository tagRepository;
     private final PublisherRepository publisherRepository;
 
-    private final Set<String> allowedSortFields = Set.of("id", "name", "release_date");
+    private final Set<String> allowedSortFields = Set.of("id", "name", "releaseDate");
 
     @Autowired
     public GameServiceImpl(GameRepository gameRepository, TagRepository tagRepository, PublisherRepository publisherRepository) {
