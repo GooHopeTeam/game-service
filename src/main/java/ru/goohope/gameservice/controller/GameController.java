@@ -58,33 +58,4 @@ public class GameController {
         return ResponseEntity.ok(gameService.getAllTags());
     }
 
-    @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ValidationError> handleConstraintViolationException(ConstraintViolationException exception) {
-        ValidationError validationError = new ValidationError();
-        for (var violation : exception.getConstraintViolations()) {
-            String queryParamPath = violation.getPropertyPath().toString();
-            String queryParam = queryParamPath.contains(".") ?
-                    queryParamPath.substring(queryParamPath.indexOf(".") + 1) :
-                    queryParamPath;
-            String constraintName = violation.getConstraintDescriptor().getAnnotation()
-                    .annotationType().getSimpleName();
-            validationError.addDetail(queryParam, ValidationError.getConstraintDescription(constraintName));
-        }
-        return new ResponseEntity<>(validationError, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(NoSuchElementException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<?> handleNoSuchElementFoundException(NoSuchElementException exception) {
-        record EmptyObject() {}
-        return new ResponseEntity<>(new EmptyObject(), HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(UndefinedSortFieldException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<ApiError> handleUndefinedSortFieldException(UndefinedSortFieldException exception) {
-        return new ResponseEntity<>(new ApiError("undefined_sort_field"), HttpStatus.BAD_REQUEST);
-    }
-
 }
