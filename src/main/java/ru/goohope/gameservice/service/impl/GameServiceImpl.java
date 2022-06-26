@@ -1,25 +1,23 @@
-package ru.goohope.gameservice.service;
+package ru.goohope.gameservice.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.jaxb.SpringDataJaxb;
 import org.springframework.stereotype.Service;
-import ru.goohope.gameservice.dto.response.FullGameDto;
-import ru.goohope.gameservice.dto.response.PublisherDto;
-import ru.goohope.gameservice.dto.response.ShortGameDto;
-import ru.goohope.gameservice.dto.response.TagDto;
+import ru.goohope.gameservice.dto.response.FullGameDtoResponse;
+import ru.goohope.gameservice.dto.response.PublisherDtoResponse;
+import ru.goohope.gameservice.dto.response.ShortGameDtoResponse;
+import ru.goohope.gameservice.dto.response.TagDtoResponse;
 import ru.goohope.gameservice.exception.UndefinedSortFieldException;
 import ru.goohope.gameservice.model.Game;
 import ru.goohope.gameservice.model.Publisher;
 import ru.goohope.gameservice.repository.GameRepository;
 import ru.goohope.gameservice.repository.PublisherRepository;
 import ru.goohope.gameservice.repository.TagRepository;
+import ru.goohope.gameservice.service.GameService;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -47,28 +45,22 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public List<ShortGameDto> getGames(int page, int size, List<String> tags, String sortField, String sortOrder) {
+    public List<ShortGameDtoResponse> getGames(int page, int size, List<String> tags, String sortField, String sortOrder) {
         Pageable pageable = makePageRequest(page, size, sortField, sortOrder);
         if (tags == null) {
-            return gameRepository.findAll(pageable).map(ShortGameDto::fromModel).toList();
+            return gameRepository.findAll(pageable).map(ShortGameDtoResponse::fromModel).toList();
         }
-        return gameRepository.findGamesByTags(tags, pageable).map(ShortGameDto::fromModel).toList();
+        return gameRepository.findGamesByTags(tags, pageable).map(ShortGameDtoResponse::fromModel).toList();
     }
 
     @Override
-    public FullGameDto getGameById(Long id) {
+    public FullGameDtoResponse getGameById(Long id) {
         Game game = gameRepository.findById(id).orElseThrow();
-        return FullGameDto.fromModel(game);
+        return FullGameDtoResponse.fromModel(game);
     }
 
     @Override
-    public PublisherDto getPublisherById(Long id) {
-        Publisher publisher = publisherRepository.findById(id).orElseThrow();
-        return PublisherDto.fromModel(publisher);
-    }
-
-    @Override
-    public List<TagDto> getAllTags() {
-        return tagRepository.findAll().stream().map(TagDto::fromModel).toList();
+    public List<TagDtoResponse> getAllTags() {
+        return tagRepository.findAll().stream().map(TagDtoResponse::fromModel).toList();
     }
 }
