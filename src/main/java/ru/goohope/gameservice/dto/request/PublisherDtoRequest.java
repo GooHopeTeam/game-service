@@ -10,7 +10,7 @@ public record PublisherDtoRequest(
         @NotBlank String logoUrl) {
 
     public Publisher toModel() {
-        return new Publisher(name, description);
+        return new Publisher(name, description, logoUrl);
     }
 
 }
