@@ -2,6 +2,7 @@ package ru.goohope.gameservice.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -17,7 +18,6 @@ import java.util.NoSuchElementException;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ValidationError> handleConstraintViolationException(ConstraintViolationException exception) {
         ValidationError validationError = new ValidationError();
         for (var violation : exception.getConstraintViolations()) {
@@ -27,21 +27,34 @@ public class GlobalExceptionHandler {
                     queryParamPath;
             String constraintName = violation.getConstraintDescriptor().getAnnotation()
                     .annotationType().getSimpleName();
-            validationError.addDetail(queryParam, ValidationError.getConstraintDescription(constraintName));
+            validationError.addDetail(queryParam, ValidationError.getDetailByConstraint(constraintName));
         }
         return new ResponseEntity<>(validationError, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(NoSuchElementException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<Void> handleNoSuchElementFoundException(NoSuchElementException exception) {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(UndefinedSortFieldException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ApiError> handleUndefinedSortFieldException(UndefinedSortFieldException exception) {
         return new ResponseEntity<>(new ApiError("undefined_sort_field"), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ValidationError> handleException(MethodArgumentNotValidException exception) {
+        ValidationError validationError = new ValidationError();
+        for (var fieldError : exception.getBindingResult().getFieldErrors()) {
+            validationError.addDetail(fieldError.getField(), ValidationError.getDetailByConstraint(fieldError.getCode()));
+        }
+        return new ResponseEntity<>(validationError, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> handleException(Exception exception) {
+        return new ResponseEntity<>(new ApiError("undefined"), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }
