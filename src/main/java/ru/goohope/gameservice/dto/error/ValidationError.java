@@ -20,14 +20,15 @@ public class ValidationError extends ApiError {
         return details;
     }
 
-    private static final Map<String, String> descriptionByConstraint = new HashMap<>();
+    private static final Map<String, String> detailByConstraint = new HashMap<>();
 
     static {
-        descriptionByConstraint.put("Positive", "less_than_1");
-        descriptionByConstraint.put("PositiveOrZero", "less_then_0");
+        detailByConstraint.put("Positive", "less_than_1");
+        detailByConstraint.put("PositiveOrZero", "less_then_0");
+        detailByConstraint.put("NotBlank", "required");
     }
 
-    public static String getConstraintDescription(String constraintName) {
-        return descriptionByConstraint.get(constraintName);
+    public static String getDetailByConstraint(String constraintName) {
+        return detailByConstraint.get(constraintName);
     }
 }
