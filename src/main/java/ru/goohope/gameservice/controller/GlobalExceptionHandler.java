@@ -42,6 +42,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(new ApiError("undefined_sort_field"), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(PublisherAlreadyExistsException.class)
+    public ResponseEntity<ApiError> handlePublisherAlreadyExistsException(PublisherAlreadyExistsException exception) {
+        return new ResponseEntity<>(new ApiError("publisher_already_exists"), HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     public ResponseEntity<ValidationError> handleException(MethodArgumentNotValidException exception) {
